@@ -1,6 +1,6 @@
 require_relative '../interpreters/default_interpreter'
 
-# The program's command line interface.
+# Command line interface for editing a bitmap.
 # Once #run is called, the BitmapEditor:
 # 1. Asks the user for input.
 # 2. Passes the input to the interpreter.
@@ -17,8 +17,13 @@ class BitmapEditor
     display 'INFO - Type ? for Help'
     while @running
       print '> '
-      expression = gets.chomp
-			@interpreter.process(expression)
+			begin 
+				expression = gets.chomp
+				@interpreter.process(expression)
+			rescue Interrupt, StandardError => e
+				# exit cleanly
+				exit
+			end
     end
   end
 
