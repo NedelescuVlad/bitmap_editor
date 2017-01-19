@@ -1,4 +1,4 @@
-require_relative '../interpreters/default_interpreter'
+require_relative '../interpreters/interpreter'
 
 # Command line interface for editing a bitmap.
 # Once #run is called, the BitmapEditor:
@@ -8,10 +8,14 @@ require_relative '../interpreters/default_interpreter'
 # 4. Loops.
 class BitmapEditor
 
+	# Initializes the BitmapEditor and associates it with an interpreter.
 	def initialize(interpreter)
+		interpreter.coupled_interface = self
 		@interpreter = interpreter
 	end
 	
+	# Runs the bitmap editor. 
+	# Fetches user input and parses it until an exit command is issued.
   def run
     @running = true
     display 'INFO - Type ? for Help'
@@ -21,16 +25,19 @@ class BitmapEditor
 				expression = gets.chomp
 				@interpreter.process(expression)
 			rescue Interrupt, StandardError => e
-				# exit cleanly
+				# exits cleanly on Ctrl-D and Ctrl-C
 				exit
 			end
     end
   end
 
+	# Displays a message to the CLI.
+	# Used for both status and error messages.
 	def display(message)
 		puts message
 	end
 
+	# Stops listening for input and exits the program.
 	def exit
 		display 'Goodbye!'
 		@running = false

@@ -1,14 +1,16 @@
-require_relative '../interpreters/default_interpreter'
-
+# Input interpreter. Handles reading and executing a user's input and 
+# sending back confirmation/error messages to the associated interface, when needed.
 class Interpreter
 	attr_writer :coupled_interface
 
+	# Couple the interpreter with a default NullInterface.
 	def intialize
-		@coupled_interface = NullInterface.new
+		@coupled_interface = NullEditor.new
 	end
 
-	def process(expression)
-		case expression
+	# Parses and executes a user's command, if valid.
+	def process(raw_input)
+		case raw_input
 		  when '?' 
 				show_help
 			when 'X' 
