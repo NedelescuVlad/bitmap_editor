@@ -20,9 +20,9 @@ class Bitmap
 		to_return
 	end
 
-	# Colors the pixel at given row and col intedexes.
+	# Colors the pixel at given row and col indexes.
 	def color_pixel(valid_row_index, valid_col_index, color)
-		# Match between the index range a user uses and the array implementation by subtracting 1.
+		# Match between the index range implied by users and the array implementation by subtracting 1.
 		row_to_color = valid_row_index - 1
 		col_to_color = valid_col_index - 1
 
@@ -32,24 +32,28 @@ class Bitmap
 	# Draws a vertical line in the given column between the given row indexes.
 	# The order in which the indexes are passed does not matter.
 	# The indexes are recognized as valid if they are within the boundaries of the bitmap.
-	def vertical_draw(valid_target_col_index, valid_start_row_index, valid_end_row_index, color)
-		# Swap the rows if the 'to' row is less than the 'from' row
-		if valid_row_to < valid_row_from 
-			valid_row_from = valid_row_from + valid_row_to
-			valid_row_to = valid_row_from - valid_row_to
-			valid_row_from = valid_row_from - valid_row_to
+	def vertical_draw(valid_target_col, valid_start_row, valid_end_row, color)
+		# Swap the row indexes if needed.
+		if valid_end_row < valid_start_row 
+			valid_start_row, valid_end_row = valid_end_row, valid_start_row
+		end
+
+		for current_row in valid_start_row..valid_end_row 
+			color_pixel(current_row, valid_target_col, color)
 		end
 	end
 
 	# Draws a horizontal line in the given column between the given row indexes.
 	# The order in which the indexes are passed does not matter.
 	# The indexes are recognized as valid if they are within the boundaries of the bitmap.
-	def horizontal_draw(valid_target_row, valid_col_from, valid_col_to, color)
-		# Swap the cols if the 'to' col is less than the 'from' col.
-		if valid_col_to < valid_col_from
-			valid_col_from = valid_col_from + valid_col_to
-			valid_col_to = valid_col_from - valid_col_to
-			valid_col_from = valid_col_from - valid_col_to
+	def horizontal_draw(valid_target_row, valid_start_col, valid_end_col, color)
+		# Swap the col indexes if needed.
+		if valid_end_col < valid_start_col
+			valid_start_col, valid_end_col = valid_end_col, valid_start_col
+		end
+
+		for current_col in valid_start_col..valid_end_col
+			color_pixel(valid_target_row, current_col, color)
 		end
 	end
 
