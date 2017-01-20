@@ -58,7 +58,7 @@ class Interpreter
 		width = confirmed_create_command[1]
 		height = confirmed_create_command[2]
 		# not yet implemented
-		@bitmap.create(width, height)
+		# @bitmap.create(width, height)
 	end
 
   #L X Y C
@@ -76,8 +76,8 @@ class Interpreter
 		row_pos = command_as_array[1]
 		col_pos = command_as_array[2]
 		color = command_as_array[3]
-
-		@bitmap.color_pixel(row_pos, col_pos, color)
+		# not implemented
+		# @bitmap.color_pixel(row_pos, col_pos, color)
 	end
 
 	#V X Y1 Y2 C
@@ -97,7 +97,7 @@ class Interpreter
 		row_to = command_as_array[3]
 		color = command_as_array[4]
 
-		@bitmap.vertical_draw(col_to_color, row_from, row_to, color)
+		# @bitmap.vertical_draw(col_to_color, row_from, row_to, color)
 	end
 
 	#H X1 X2 Y C 
@@ -117,7 +117,7 @@ class Interpreter
 		row_to_color = command_as_array[3]
 		color = command_as_array[4]
 
-		@bitmap.horizontal_draw(col_from, col_to, row_to_color, color)
+		# @bitmap.horizontal_draw(col_from, col_to, row_to_color, color)
 	end
 
 	def show_help
