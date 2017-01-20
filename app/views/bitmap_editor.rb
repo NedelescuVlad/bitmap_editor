@@ -21,13 +21,15 @@ class BitmapEditor
     display 'INFO - Type ? for Help'
     while @running
       print '> '
-			begin 
+			#begin 
 				expression = gets.chomp
+				# Remove trailing/forwarding whitespaces
+				expression = expression.strip || expression
 				@interpreter.process(expression)
-			rescue Interrupt, StandardError => e
-				# exits cleanly on Ctrl-D and Ctrl-C
-				exit
-			end
+			#rescue Interrupt, StandardError => e
+				## exits cleanly on Ctrl-D and Ctrl-C
+				#exit
+			#end
     end
   end
 

@@ -9,110 +9,133 @@ class Interpreter
 	def initialize
 		@coupled_interface = NullEditor.new
 		@bitmap = Bitmap.new
+		# TODO: Replace flag with null bitmap object
 		@image_created = false
 	end
 
 	# Parses and executes a user's command, if valid.
-	# Lowercase 
 	def process(raw_input)
 		raw_input.upcase!
 		case raw_input
 		  when '?' 
 				show_help
-
 			when 'X' 
 				exit
-
 			when 'C'
-				@bitmap.clear
-
+				issue_clear_command
 			when 'S'
 				display @bitmap.to_s
-
-			# The following commands are recognized but the program exits due to a bug.
-			# Create command
-			when /I \d{1,3} \d{1,3}/
+			when /I \d+ \d+/
 				issue_create_command(raw_input)
-
-			# Color pixel command
-			when /L \d{1,3} \d{1,3} [A-Z]+/ 
+			when /L \d+ \d+ [A-Z]+/ 
 				issue_color_pixel_command(raw_input)
-
-			# Vertical draw command
-			when /V \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
+			when /V \d+ \d+ \d+ [0-9A-Z]/ 
 				issue_vertical_draw_command(raw_input)
-
-			when /H \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
+			when /H \d+ \d+ \d+ [0-9A-Z]/ 
 				issue_horizontal_draw_command(raw_input)
-
 			else 
-				display 'unrecognised command :('
+				display ErrorMessages.invalid_command
 		end
 	end
 
   private
 
-	def issue_create_command(confirmed_create_command)
-		command_as_array = confirmed_create_command.split
-		width = confirmed_create_command[1].to_i
-		height = confirmed_create_command[2].to_i
+		# I M N
+		def issue_create_command(confirmed_create_command)
+			create_command_as_array = confirmed_create_command.split
 
-		@image_created = true
+			image_width = create_command_as_array[1].to_i
+			image_height = create_command_as_array[2].to_i
 
-		# not yet implemented
-		@bitmap.create(width, height)
-	end
+			if !@bitmap.valid_create_params?(image_width, image_height)
+				display ErrorMessages.invalid_create_params
+				return
+			end
 
-	def issue_color_pixel_command(confirmed_color_pixel_command)
-		if !@image_created 
-			display please_create_image_first
-			return
+			@bitmap.create(image_width, image_height)
+			@image_created = true
+		end
+
+		# C
+		def issue_clear_command
+			if !@image_created 
+				display ErrorMessages.no_image_found
+				return
+			end
+
+			@bitmap.clear
+		end
+
+		# L X Y C
+		def issue_color_pixel_command(confirmed_color_pixel_command)
+			if !@image_created 
+				display ErrorMessages.no_image_found
+				return
+			end
+			
+			command_as_array = confirmed_color_pixel_command.split
+			row_pos = command_as_array[1].to_i
+			col_pos = command_as_array[2].to_i
+			color = command_as_array[3]
+
+			if @bitmap.validates_row_index?(row_pos) && @bitmap.validates_col_index?(col_pos)
+				@bitmap.color_pixel(row_pos, col_pos, color)
+			else
+				display ErrorMessages.index_out_of_bounds
+			end
+		end
+
+		# V X Y1 Y2 C 
+		def issue_vertical_draw_command(confirmed_vertical_draw_command)
+			if !@image_created 
+				display ErrorMessages.no_image_found
+				return
+			end
+
+			command_as_array = confirmed_vertical_draw_command.split
+			target_col = command_as_array[1].to_i
+			row_index_1 = command_as_array[2].to_i
+			row_index_2 = command_as_array[3].to_i
+			color = command_as_array[4]
+
+			if valid_vertical_draw_command?(target_col, row_index_1, row_index_2)
+				@bitmap.vertical_draw(target_col, row_index_1, row_index_2, color)
+			else
+				display ErrorMessages.index_out_of_bounds
+			end
 		end
 		
-		command_as_array = confirmed_color_pixel_command.split
-		row_pos = command_as_array[1].to_i
-		col_pos = command_as_array[2].to_i
-		color = command_as_array[3]
-		# not implemented
-		# @bitmap.color_pixel(row_pos, col_pos, color)
-	end
-
-	def issue_vertical_draw_command(confirmed_vertical_draw_command)
-		if !@image_created 
-			display please_create_image_first
-			return
+		def valid_vertical_draw_command?(target_col, row_index_1, row_index_2)
+			@bitmap.validates_row_indexes?([row_index_1, row_index_2]) && @bitmap.validates_col_index?(target_col)
 		end
 
-		command_as_array = confirmed_vertical_draw_command.split
-		col_to_color = command_as_array[1].to_i
-		row_from = command_as_array[2].to_i
-		row_to = command_as_array[3].to_i
-		color = command_as_array[4]
+		# H X1 X2 Y C
+		def issue_horizontal_draw_command(confirmed_horizontal_draw_command)
+			if !@image_created 
+				display ErrorMessages.no_image_found
+				return
+			end
 
-		# @bitmap.vertical_draw(col_to_color, row_from, row_to, color)
-	end
+			command_as_array = confirmed_horizontal_draw_command.split
+			col_index_1 = command_as_array[1].to_i
+			col_index_2	= command_as_array[2].to_i
+			target_row = command_as_array[3].to_i
+			color = command_as_array[4]
 
-	def horizontal_draw_command?(raw_input)
-		/H \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ =~ raw_input
-	end
-
-	def issue_horizontal_draw_command(confirmed_horizontal_draw_command)
-		if !@image_created 
-			display please_create_image_first
-			return
+			if valid_horizontal_draw_command?(target_row, col_index_1, col_index_2)
+				@bitmap.horizontal_draw(target_row, col_index_1, col_index_2, color)
+			else
+				display ErrorMessages.index_out_of_bounds
+			end
 		end
 
-		command_as_array = confirmed_horizontal_draw_command.split
-		col_from = command_as_array[1].to_i
-		col_to = command_as_array[2].to_i
-		row_to_color = command_as_array[3].to_i
-		color = command_as_array[4]
+		def valid_horizontal_draw_command?(target_row, col_index_1, col_index_2)
+			@bitmap.validates_row_index?(target_row) && @bitmap.validates_col_indexes?([col_index_1, col_index_2])
+		end
 
-		# @bitmap.horizontal_draw(col_from, col_to, row_to_color, color)
-	end
-
-	def show_help
-		help_text = "? - Help
+		# S
+		def show_help
+			help_text = "? - Help
 I M N - Create a new M x N image with all pixels coloured white (O).
 C - Clears the table, setting all pixels to white (O).
 L X Y C - Colours the pixel (X,Y) with colour C.
@@ -120,20 +143,34 @@ V X Y1 Y2 C - Draw a vertical segment of colour C in column X between rows Y1 an
 H X1 X2 Y C - Draw a horizontal segment of colour C in row Y between columns X1 and X2 (inclusive).
 S - Show the contents of the current image
 X - Terminate the session"
-		display help_text
-	end
+			display help_text
+		end
 
-	def please_create_image_first
-		"Please create an image first."
-	end
+		# Exit the program.
+		def exit
+			@coupled_interface.exit
+		end
 
-	# Exit the program.
-	def exit
-		@coupled_interface.exit
-	end
+		# Display a message to the user interface.
+		def display(message)
+			@coupled_interface.display message
+		end
 
-	# Display a message to the user interface.
-	def display(message)
-		@coupled_interface.display message
-	end
+		module ErrorMessages
+			def self.no_image_found
+				"Please create an image first."
+			end
+
+			def self.index_out_of_bounds
+				"An index is out of bounds."
+			end
+
+			def self.invalid_create_params
+				"Image needs to be at least 1 x 1 and at most 250 x 250."
+			end
+
+			def self.invalid_command
+				'unrecognised command :('
+			end
+		end
 end
