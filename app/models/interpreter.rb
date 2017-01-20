@@ -9,6 +9,7 @@ class Interpreter
 	def initialize
 		@coupled_interface = NullEditor.new
 		@bitmap = Bitmap.new
+		# TODO: Replace flag with null bitmap object
 		@image_created = false
 	end
 
@@ -19,53 +20,54 @@ class Interpreter
 		case raw_input
 		  when '?' 
 				show_help
-
 			when 'X' 
 				exit
-
 			when 'C'
-				@bitmap.clear
-
+				issue_clear_command
 			when 'S'
 				display @bitmap.to_s
-
-			# The following commands are recognized but the program exits due to a bug.
-			# Create command
-			when /I \d{1,3} \d{1,3}/
+			when /I \d+ \d+/
 				issue_create_command(raw_input)
-
-			# Color pixel command
-			when /L \d{1,3} \d{1,3} [A-Z]+/ 
+			when /L \d+ \d+ [A-Z]+/ 
 				issue_color_pixel_command(raw_input)
-
-			# Vertical draw command
-			when /V \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
+			when /V \d+ \d+ \d+ [A-Z]+/ 
 				issue_vertical_draw_command(raw_input)
-
-			when /H \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
+			when /H \d+ \d+ \d+ [A-Z]+/ 
 				issue_horizontal_draw_command(raw_input)
-
 			else 
-				display 'unrecognised command :('
+				display invalid_command_message
 		end
 	end
 
   private
 
 	def issue_create_command(confirmed_create_command)
-		command_as_array = confirmed_create_command.split
-		width = confirmed_create_command[1].to_i
-		height = confirmed_create_command[2].to_i
+		create_command_as_array = confirmed_create_command.split
 
+		image_width = create_command_as_array[1].to_i
+		image_height = create_command_as_array[2].to_i
+
+		if !@bitmap.valid_create_params?(image_width, image_height)
+			display invalid_create_params_message
+			return
+		end
+
+		@bitmap.create(image_width, image_height)
 		@image_created = true
+	end
 
-		# not yet implemented
-		@bitmap.create(width, height)
+	def issue_clear_command
+		if !@image_created 
+			display no_image_found_message
+			return
+		end
+
+		@bitmap.clear
 	end
 
 	def issue_color_pixel_command(confirmed_color_pixel_command)
 		if !@image_created 
-			display please_create_image_first
+			display no_image_found_message
 			return
 		end
 		
@@ -79,7 +81,7 @@ class Interpreter
 
 	def issue_vertical_draw_command(confirmed_vertical_draw_command)
 		if !@image_created 
-			display please_create_image_first
+			display no_image_found_message
 			return
 		end
 
@@ -123,8 +125,16 @@ X - Terminate the session"
 		display help_text
 	end
 
-	def please_create_image_first
+	def no_image_found_message
 		"Please create an image first."
+	end
+
+	def invalid_create_params_message
+		"Image needs to be at least 1 x 1 and at most 250 x 250."
+	end
+
+	def invalid_command_message
+		'unrecognised command :('
 	end
 
 	# Exit the program.
