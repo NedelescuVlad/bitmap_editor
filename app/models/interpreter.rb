@@ -30,16 +30,16 @@ class Interpreter
 				display @bitmap.to_s
 
 			when create_command?(raw_input)
-				issue_create_command(raw_input)
+				issue_create_command(valid_input)
 
-			when color_pixel_command?
-				issue_color_pixel_command(raw_input)
+			when color_pixel_command?(raw_input)
+				issue_color_pixel_command(valid_input)
 
-			when vertical_draw_command?
-				issue_vertical_draw_command(raw_input)
+			when vertical_draw_command?(raw_input)
+				issue_vertical_draw_command(valid_input)
 
 			when horizontal_draw_command?(raw_input)
-				issue_horizontal_draw_command(raw_input)
+				issue_horizontal_draw_command(valid_input)
 
 			else 
 				display 'unrecognised command :('
@@ -57,8 +57,11 @@ class Interpreter
 		command_as_array = confirmed_create_command.split
 		width = confirmed_create_command[1]
 		height = confirmed_create_command[2]
+
+		@image_created = true
+
 		# not yet implemented
-		# @bitmap.create(width, height)
+		@bitmap.create(width, height)
 	end
 
   #L X Y C
