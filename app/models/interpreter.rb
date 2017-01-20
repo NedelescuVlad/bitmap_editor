@@ -32,18 +32,18 @@ class Interpreter
 			# The following commands are recognized but the program exits due to a bug.
 			# Create command
 			when /I \d{1,3} \d{1,3}/
-				issue_create_command(valid_input)
+				issue_create_command(raw_input)
 
 			# Color pixel command
 			when /L \d{1,3} \d{1,3} [A-Z]+/ 
-				issue_color_pixel_command(valid_input)
+				issue_color_pixel_command(raw_input)
 
 			# Vertical draw command
 			when /V \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
-				issue_vertical_draw_command(valid_input)
+				issue_vertical_draw_command(raw_input)
 
 			when /H \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
-				issue_horizontal_draw_command(valid_input)
+				issue_horizontal_draw_command(raw_input)
 
 			else 
 				display 'unrecognised command :('
@@ -54,8 +54,8 @@ class Interpreter
 
 	def issue_create_command(confirmed_create_command)
 		command_as_array = confirmed_create_command.split
-		width = confirmed_create_command[1]
-		height = confirmed_create_command[2]
+		width = confirmed_create_command[1].to_i
+		height = confirmed_create_command[2].to_i
 
 		@image_created = true
 
@@ -70,8 +70,8 @@ class Interpreter
 		end
 		
 		command_as_array = confirmed_color_pixel_command.split
-		row_pos = command_as_array[1]
-		col_pos = command_as_array[2]
+		row_pos = command_as_array[1].to_i
+		col_pos = command_as_array[2].to_i
 		color = command_as_array[3]
 		# not implemented
 		# @bitmap.color_pixel(row_pos, col_pos, color)
@@ -84,9 +84,9 @@ class Interpreter
 		end
 
 		command_as_array = confirmed_vertical_draw_command.split
-		col_to_color = command_as_array[1]
-		row_from = command_as_array[2]
-		row_to = command_as_array[3]
+		col_to_color = command_as_array[1].to_i
+		row_from = command_as_array[2].to_i
+		row_to = command_as_array[3].to_i
 		color = command_as_array[4]
 
 		# @bitmap.vertical_draw(col_to_color, row_from, row_to, color)
@@ -103,9 +103,9 @@ class Interpreter
 		end
 
 		command_as_array = confirmed_horizontal_draw_command.split
-		col_from = command_as_array[1]
-		col_to = command_as_array[2]
-		row_to_color = command_as_array[3]
+		col_from = command_as_array[1].to_i
+		col_to = command_as_array[2].to_i
+		row_to_color = command_as_array[3].to_i
 		color = command_as_array[4]
 
 		# @bitmap.horizontal_draw(col_from, col_to, row_to_color, color)
