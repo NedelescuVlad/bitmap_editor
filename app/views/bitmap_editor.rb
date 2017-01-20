@@ -23,6 +23,8 @@ class BitmapEditor
       print '> '
 			#begin 
 				expression = gets.chomp
+				# Remove trailing/forwarding whitespaces
+				expression = expression.strip || expression
 				@interpreter.process(expression)
 			#rescue Interrupt, StandardError => e
 				## exits cleanly on Ctrl-D and Ctrl-C
