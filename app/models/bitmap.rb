@@ -2,6 +2,8 @@ class Bitmap
 
 	def create(width, height)
 		@image = Array.new(width) { Array.new(height) } 
+		@row_count = width
+		@height_count = height
 	end
 
 	def to_s

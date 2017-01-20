@@ -29,16 +29,20 @@ class Interpreter
 			when 'S'
 				display @bitmap.to_s
 
-			when create_command?(raw_input)
+			# The following commands are recognized but the program exits due to a bug.
+			# Create command
+			when /I \d{1,3} \d{1,3}/
 				issue_create_command(valid_input)
 
-			when color_pixel_command?(raw_input)
+			# Color pixel command
+			when /L \d{1,3} \d{1,3} [A-Z]+/ 
 				issue_color_pixel_command(valid_input)
 
-			when vertical_draw_command?(raw_input)
+			# Vertical draw command
+			when /V \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
 				issue_vertical_draw_command(valid_input)
 
-			when horizontal_draw_command?(raw_input)
+			when /H \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ 
 				issue_horizontal_draw_command(valid_input)
 
 			else 
@@ -47,11 +51,6 @@ class Interpreter
 	end
 
   private
-
-	#I M N
-	def create_command?(raw_input)
-		/I \d \d/ =~ raw_input
-	end
 
 	def issue_create_command(confirmed_create_command)
 		command_as_array = confirmed_create_command.split
@@ -62,11 +61,6 @@ class Interpreter
 
 		# not yet implemented
 		@bitmap.create(width, height)
-	end
-
-  #L X Y C
-	def color_pixel_command?(raw_input)
-		/L \d \d [A-Z]+/ =~ raw_input
 	end
 
 	def issue_color_pixel_command(confirmed_color_pixel_command)
@@ -81,11 +75,6 @@ class Interpreter
 		color = command_as_array[3]
 		# not implemented
 		# @bitmap.color_pixel(row_pos, col_pos, color)
-	end
-
-	#V X Y1 Y2 C
-	def vertical_draw_command?(raw_input)
-		/V \d \d \d [A-Z]+/ =~ raw_input
 	end
 
 	def issue_vertical_draw_command(confirmed_vertical_draw_command)
@@ -103,9 +92,8 @@ class Interpreter
 		# @bitmap.vertical_draw(col_to_color, row_from, row_to, color)
 	end
 
-	#H X1 X2 Y C 
 	def horizontal_draw_command?(raw_input)
-		/H \d \d \d [A-Z]+/ =~ raw_input
+		/H \d{1,3} \d{1,3} \d{1,3} [A-Z]+/ =~ raw_input
 	end
 
 	def issue_horizontal_draw_command(confirmed_horizontal_draw_command)
