@@ -8,21 +8,35 @@ class Bitmap
 		@height = height
 	end
 
-	# String representation of the bit image.
-	def to_s
-		to_return = ""
-		for row in 0...@height
-			for col in 0...@width
-				to_return << @image[row][col].to_s
+	def validates_row_indexes?(row_indexes = [])
+		row_indexes.each do |row_index|
+			if !validates_row_index?(row_index)
+				return false
 			end
-			to_return << $/
 		end
-		to_return
+		true
+	end
+	
+	def validates_row_index?(row_index)
+		row_index >= 1 && row_index <= @height
+	end
+	
+	def validates_col_indexes?(col_indexes = [])
+		col_indexes.each do |col_index|
+			if !validates_col_index?(col_index)
+				return false
+			end
+		end
+		true
 	end
 
-	# Colors the pixel at given row and col indexes.
+	def validates_col_index?(col_index)
+		col_index >= 1 && col_index <= @width
+	end
+	
+	# Colors the pixel at the given row and col indexes.
 	def color_pixel(valid_row_index, valid_col_index, color)
-		# Match between the index range implied by users and the array implementation by subtracting 1.
+		# Subtract 1 to match the index range implied by users with the array implementation.
 		row_to_color = valid_row_index - 1
 		col_to_color = valid_col_index - 1
 
@@ -73,5 +87,17 @@ class Bitmap
 
 		(width >= lower_bound && width <= upper_bound) &&
 		(height >= lower_bound && height <= upper_bound)
+	end
+	
+	# String representation of the bit image.
+	def to_s
+		to_return = ""
+		for row in 0...@height
+			for col in 0...@width
+				to_return << @image[row][col].to_s
+			end
+			to_return << $/
+		end
+		to_return
 	end
 end
