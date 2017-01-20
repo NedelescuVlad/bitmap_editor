@@ -24,14 +24,14 @@ class Interpreter
 			when 'C'
 				issue_clear_command
 			when 'S'
-				display @bitmap.to_s
-			when /I \d+ \d+/
+				issue_show_command
+			when /^I \d+ \d+$/
 				issue_create_command(raw_input)
-			when /L \d+ \d+ [A-Z]+/ 
+			when /^L \d+ \d+ [A-Z]+$/ 
 				issue_color_pixel_command(raw_input)
-			when /V \d+ \d+ \d+ [0-9A-Z]/ 
+			when /^V \d+ \d+ \d+ [0-9A-Z]$/ 
 				issue_vertical_draw_command(raw_input)
-			when /H \d+ \d+ \d+ [0-9A-Z]/ 
+			when /^H \d+ \d+ \d+ [0-9A-Z]$/ 
 				issue_horizontal_draw_command(raw_input)
 			else 
 				display ErrorMessages.invalid_command
@@ -54,6 +54,15 @@ class Interpreter
 
 			@bitmap.create(image_width, image_height)
 			@image_created = true
+		end
+
+		# S
+		def issue_show_command
+			if !@image_created
+				display ErrorMessages.no_image_found
+				return
+			end
+			display @bitmap.to_s
 		end
 
 		# C
