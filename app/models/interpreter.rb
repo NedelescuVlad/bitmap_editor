@@ -1,10 +1,11 @@
+require_relative '../views/null_editor'
 # Input interpreter. Handles reading and executing a user's input and 
 # sending back confirmation/error messages to the associated interface, when needed.
 class Interpreter
-	attr_writer :coupled_interface
+	attr_accessor :coupled_interface
 
 	# Couple the interpreter with a default NullInterface.
-	def intialize
+	def initialize
 		@coupled_interface = NullEditor.new
 	end
 
@@ -33,10 +34,12 @@ X - Terminate the session"
 			display help_text
     end
 
+		# Exit the program.
 		def exit
 			@coupled_interface.exit
 		end
 
+		# Display a message to the user interface.
 		def display(message)
 			@coupled_interface.display message
 		end

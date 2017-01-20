@@ -1,4 +1,4 @@
-require_relative '../interpreters/interpreter'
+require_relative '../models/interpreter'
 
 # Command line interface for editing a bitmap.
 # Once #run is called, the BitmapEditor:
